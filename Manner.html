@@ -315,13 +315,68 @@ modFit &lt;- train(trainData$classe ~ ., data = trainData, method = &quot;rf&quo
 ## E    0    1    3    8 1792    0.006652
 </code></pre>
 
-<p>By subtracting the class.error from 1, one can see that the Sensitivity are all well over 98%.</p>
+<p>By subtracting the class.error from 1, one can see that the Sensitivity are all well over 98%. </p>
+
+<pre><code class="r">library(caret)
+</code></pre>
+
+<pre><code>## Loading required package: lattice
+## Loading required package: ggplot2
+</code></pre>
+
+<pre><code class="r"># Apply the prediction on the train data
+predt &lt;- predict(modFit, newdata = trainData)
+</code></pre>
+
+<pre><code>## Loading required package: randomForest
+## randomForest 4.6-7
+## Type rfNews() to see new features/changes/bug fixes.
+</code></pre>
+
+<pre><code class="r">confusionMatrix(predt, trainData$classe)
+</code></pre>
+
+<pre><code>## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction    A    B    C    D    E
+##          A 2790    0    0    0    0
+##          B    0 1899    0    0    0
+##          C    0    0 1711    0    0
+##          D    0    0    0 1608    0
+##          E    0    0    0    0 1804
+## 
+## Overall Statistics
+##                                 
+##                Accuracy : 1     
+##                  95% CI : (1, 1)
+##     No Information Rate : 0.284 
+##     P-Value [Acc &gt; NIR] : &lt;2e-16
+##                                 
+##                   Kappa : 1     
+##  Mcnemar&#39;s Test P-Value : NA    
+## 
+## Statistics by Class:
+## 
+##                      Class: A Class: B Class: C Class: D Class: E
+## Sensitivity             1.000    1.000    1.000    1.000    1.000
+## Specificity             1.000    1.000    1.000    1.000    1.000
+## Pos Pred Value          1.000    1.000    1.000    1.000    1.000
+## Neg Pred Value          1.000    1.000    1.000    1.000    1.000
+## Prevalence              0.284    0.194    0.174    0.164    0.184
+## Detection Rate          0.284    0.194    0.174    0.164    0.184
+## Detection Prevalence    0.284    0.194    0.174    0.164    0.184
+## Balanced Accuracy       1.000    1.000    1.000    1.000    1.000
+</code></pre>
+
+<p>Using the training data back as a test set, the in sample error is 0%.  As always, the out of sample error will be larger.</p>
 
 <h2>4. Testing of Prediction Model</h2>
 
 <p>The model is use to predict the test set and the confusion matrix is output as shown below.</p>
 
-<pre><code class="r"># Apply the prediction on the test data
+<pre><code class="r">library(caret)
+# Apply the prediction on the test data
 pred &lt;- predict(modFit, newdata = testData)
 confusionMatrix(pred, testData$classe)
 </code></pre>
@@ -359,7 +414,7 @@ confusionMatrix(pred, testData$classe)
 ## Balanced Accuracy       0.998    0.991    0.994    0.992    0.995
 </code></pre>
 
-<p>Looking at the Statistics by Class, the Sensitivity, Specificity, Positve Prediction Value and the Negative Prediction Value are all above 90%.</p>
+<p>Looking at the Statistics by Class, the Sensitivity, Specificity, Positve Prediction Value and the Negative Prediction Value are all above 90%. The accuracy is 98.9% as compared to the train dataset of 100%.</p>
 
 </body>
 

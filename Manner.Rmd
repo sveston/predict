@@ -60,20 +60,29 @@ modFit
 modFit$finalModel
 ```
 
-By subtracting the class.error from 1, one can see that the Sensitivity are all well over 98%.
+By subtracting the class.error from 1, one can see that the Sensitivity are all well over 98%. 
 
+```{r}
+library(caret)
+#Apply the prediction on the train data
+predt <- predict(modFit,newdata=trainData)
+confusionMatrix(predt,trainData$classe)
+```
+
+Using the training data back as a test set, the in sample error is 0%.  As always, the out of sample error will be larger.
 
 ## 4. Testing of Prediction Model  
 
 The model is use to predict the test set and the confusion matrix is output as shown below.
 
 ```{r}
+library(caret)
 #Apply the prediction on the test data
 pred <- predict(modFit,newdata=testData)
 confusionMatrix(pred,testData$classe)
 ```
 
-Looking at the Statistics by Class, the Sensitivity, Specificity, Positve Prediction Value and the Negative Prediction Value are all above 90%.
+Looking at the Statistics by Class, the Sensitivity, Specificity, Positve Prediction Value and the Negative Prediction Value are all above 90%. The accuracy is 98.9% as compared to the train dataset of 100%.
 
 
 
