@@ -1,0 +1,74 @@
+Prediction of Exercise Manner
+========================================================
+
+##1. Synopsis
+
+Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement - a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it.  
+
+In this report, I will be to using data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website [here] http://groupware.les.inf.puc-rio.br/har (see the section on the Weight Lifting Exercise Dataset).    
+
+###Data  
+
+The training data for this project are available here:   
+
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv  
+
+The test data are available here:   
+
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv   
+
+The data for this project come from this source: http://groupware.les.inf.puc-rio.br/har. 
+
+
+## Data Preprocessing  
+
+Looking at the training raw data, one will noticed that there are many "NA"s or empty columns.  My first step of cleaning the data is to find in each column, what percentage are not made up of "NA"s. On doing so, I realized there are only 2 thresholds in each of the columns i.e. 1 (no "NA"s) and 0.021 (almost 98% of "NA"s). So a natural selection is to subset the data with full non "NA"s data.  This cut the variables from 160 to 60. After removing the 100 variables, I looked into the description and the entries of the variables. I realized there are 7 additional variables, namely X, user_name, raw_timestamp_part_1, raw_timestamp_part_2, cvtd_timestamp, new_window and num_window. Either they have no logical relation to the manner or the entries have no relation to the manner.  This leave me with just 53 variables. The code are as shown here :-
+
+```{r}
+#Load training raw data
+trainRawData <- read.csv("pml-training.csv",na.strings=c("NA",""))
+
+#Find the proportion of non "Na"s in each column
+P_nonNa<-as.data.frame(apply(trainRawData, 2, function(x) sum(!is.na(x)))/19622)
+table(P_nonNa[,1])
+
+#Looking into the rest of the variables to remove
+validvar<-subset(P_nonNa,P_nonNa>0.5)
+head(validvar,10)
+
+#Creating the valid Training Data Set for training
+NAs <- apply(trainRawData,2,function(x) {sum(is.na(x))})
+validData <- trainRawData[,which(NAs == 0)]
+cols <- c(1:7)
+validData <- validData[,-cols]
+```
+
+##Training the Model  
+
+Next, the data set will be needed to be partition into 2 parts, one for training and the other for testing. For this set, I have partition the data into 50:50. And then using Random Forest, the model is shown as below.
+
+```{r }
+trainIndex <- createDataPartition(y = validData$classe, p=0.5,list=FALSE)
+trainData <- validData[trainIndex,]
+testData <- validData[-trainIndex,]
+modFit <- train(trainData$classe ~.,data = trainData, method="rf")
+modFit
+modFit$finalModel
+```
+
+By subtracting the class.error from 1, one can see that the Sensitivity are all well over 98%.
+
+
+##Testing of Prediction Model  
+
+The model is use to predict the test set and the confusion matrix is output as shown below.
+
+```{r}
+pred <- predict(modFit,newdata=testData)
+confusionMatrix(pred,testData$classe)
+```
+
+Looking at the Statistics by Class, the Sensitivity, Specificity, Positve Prediction Value and the Negative Prediction Value are all above 90%.
+
+
+
